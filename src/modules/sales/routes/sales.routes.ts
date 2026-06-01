@@ -5,6 +5,7 @@ import { ensureAuthenticated } from '../../../shared/middlewares/ensure-authenti
 import { createSaleController } from '../controllers/create-sale.controller'
 import { listSalesController } from '../controllers/list-sales.controller'
 import { getSaleByIdController } from '../controllers/get-sale-by-id.controller'
+import { cancelSaleController } from '../controllers/cancel-sale.controller'
 
 export async function salesRoutes(app: FastifyInstance) {
   app.post(
@@ -30,4 +31,11 @@ export async function salesRoutes(app: FastifyInstance) {
     },
     getSaleByIdController,
   )
+  app.patch(
+  '/:id/cancel',
+  {
+    preHandler: ensureAuthenticated,
+  },
+  cancelSaleController,
+)
 }
