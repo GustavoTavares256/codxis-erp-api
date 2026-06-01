@@ -1,3 +1,9 @@
 import type { FastifyInstance } from 'fastify'
 
-export function registerSalesModule(_app: FastifyInstance) {}
+import { salesRoutes } from './sales.routes'
+
+export function registerSalesModule(app: FastifyInstance) {
+  app.register(salesRoutes, {
+    prefix: '/sales',
+  })
+}
