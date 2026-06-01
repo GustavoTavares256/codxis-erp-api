@@ -1,0 +1,224 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model Company {
+  id                    String                 @id @default(uuid())
+  name                  String
+  document              String?                @unique
+  email                 String?
+  phone                 String?
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  categories            Category[]
+  customers             Customer[]
+  financialTransactions FinancialTransaction[]
+  products              Product[]
+  sales                 Sale[]
+  stockMovements        StockMovement[]
+  suppliers             Supplier[]
+  users                 User[]
+
+  @@map("companies")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(EMPLOYEE)
+  companyId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  sales     Sale[]
+  company   Company  @relation(fields: [companyId], references: [id])
+
+  @@index([companyId], map: "users_companyId_fkey")
+  @@map("users")
+}
+
+model Category {
+  id        String    @id @default(uuid())
+  name      String
+  companyId String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  company   Company   @relation(fields: [companyId], references: [id])
+  products  Product[]
+
+  @@index([companyId], map: "categories_companyId_fkey")
+  @@map("categories")
+}
+
+model Supplier {
+  id        String    @id @default(uuid())
+  name      String
+  document  String?
+  email     String?
+  phone     String?
+  companyId String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  products  Product[]
+  company   Company   @relation(fields: [companyId], references: [id])
+
+  @@index([companyId], map: "suppliers_companyId_fkey")
+  @@map("suppliers")
+}
+
+model Product {
+  id             String          @id @default(uuid())
+  name           String
+  description    String?
+  sku            String?
+  barcode        String?
+  costPrice      Decimal         @db.Decimal(10, 2)
+  salePrice      Decimal         @db.Decimal(10, 2)
+  quantity       Int             @default(0)
+  minimumStock   Int             @default(0)
+  isActive       Boolean         @default(true)
+  companyId      String
+  categoryId     String?
+  supplierId     String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  category       Category?       @relation(fields: [categoryId], references: [id])
+  company        Company         @relation(fields: [companyId], references: [id])
+  supplier       Supplier?       @relation(fields: [supplierId], references: [id])
+  saleItems      SaleItem[]
+  stockMovements StockMovement[]
+
+  @@index([categoryId], map: "products_categoryId_fkey")
+  @@index([companyId], map: "products_companyId_fkey")
+  @@index([supplierId], map: "products_supplierId_fkey")
+  @@map("products")
+}
+
+model Customer {
+  id        String   @id @default(uuid())
+  name      String
+  document  String?
+  email     String?
+  phone     String?
+  companyId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  company   Company  @relation(fields: [companyId], references: [id])
+  sales     Sale[]
+
+  @@index([companyId], map: "customers_companyId_fkey")
+  @@map("customers")
+}
+
+model Sale {
+  id                   String                @id @default(uuid())
+  totalAmount          Decimal               @db.Decimal(10, 2)
+  paymentMethod        PaymentMethod
+  status               SaleStatus            @default(COMPLETED)
+  companyId            String
+  customerId           String?
+  userId               String
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  financialTransaction FinancialTransaction?
+  items                SaleItem[]
+  company              Company               @relation(fields: [companyId], references: [id])
+  customer             Customer?             @relation(fields: [customerId], references: [id])
+  user                 User                  @relation(fields: [userId], references: [id])
+
+  @@index([companyId], map: "sales_companyId_fkey")
+  @@index([customerId], map: "sales_customerId_fkey")
+  @@index([userId], map: "sales_userId_fkey")
+  @@map("sales")
+}
+
+model SaleItem {
+  id        String   @id @default(uuid())
+  quantity  Int
+  unitPrice Decimal  @db.Decimal(10, 2)
+  subtotal  Decimal  @db.Decimal(10, 2)
+  saleId    String
+  productId String
+  createdAt DateTime @default(now())
+  product   Product  @relation(fields: [productId], references: [id])
+  sale      Sale     @relation(fields: [saleId], references: [id])
+
+  @@index([productId], map: "sale_items_productId_fkey")
+  @@index([saleId], map: "sale_items_saleId_fkey")
+  @@map("sale_items")
+}
+
+model StockMovement {
+  id        String            @id @default(uuid())
+  type      StockMovementType
+  quantity  Int
+  reason    String?
+  productId String
+  companyId String
+  createdAt DateTime          @default(now())
+  company   Company           @relation(fields: [companyId], references: [id])
+  product   Product           @relation(fields: [productId], references: [id])
+
+  @@index([companyId], map: "stock_movements_companyId_fkey")
+  @@index([productId], map: "stock_movements_productId_fkey")
+  @@map("stock_movements")
+}
+
+model FinancialTransaction {
+  id          String                     @id @default(uuid())
+  description String
+  amount      Decimal                    @db.Decimal(10, 2)
+  type        FinancialTransactionType
+  status      FinancialTransactionStatus @default(PENDING)
+  dueDate     DateTime?
+  paidAt      DateTime?
+  companyId   String
+  saleId      String?                    @unique
+  createdAt   DateTime                   @default(now())
+  updatedAt   DateTime                   @updatedAt
+  company     Company                    @relation(fields: [companyId], references: [id])
+  sale        Sale?                      @relation(fields: [saleId], references: [id])
+
+  @@index([companyId], map: "financial_transactions_companyId_fkey")
+  @@map("financial_transactions")
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  EMPLOYEE
+}
+
+enum StockMovementType {
+  IN
+  OUT
+  ADJUSTMENT
+}
+
+enum PaymentMethod {
+  PIX
+  CASH
+  CARD
+}
+
+enum SaleStatus {
+  PENDING
+  COMPLETED
+  CANCELED
+}
+
+enum FinancialTransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum FinancialTransactionStatus {
+  PENDING
+  PAID
+  CANCELED
+}

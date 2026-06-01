@@ -4,7 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/server.js",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/**/*.test.ts",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio"
   },
   "repository": {
     "type": "git",
@@ -17,5 +24,23 @@
   "bugs": {
     "url": "https://github.com/GustavoTavares256/codxis-erp-api/issues"
   },
-  "homepage": "https://github.com/GustavoTavares256/codxis-erp-api#readme"
+  "homepage": "https://github.com/GustavoTavares256/codxis-erp-api#readme",
+  "dependencies": {
+    "@fastify/cors": "^11.2.0",
+    "@fastify/jwt": "^10.1.0",
+    "@prisma/adapter-mariadb": "^7.8.0",
+    "@prisma/client": "^7.8.0",
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^17.4.2",
+    "fastify": "^5.8.5",
+    "prisma": "^7.8.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^25.9.1",
+    "tsup": "^8.5.1",
+    "tsx": "^4.22.3",
+    "typescript": "^6.0.3"
+  }
 }
