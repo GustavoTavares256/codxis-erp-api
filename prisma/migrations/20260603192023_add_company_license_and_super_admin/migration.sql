@@ -1,0 +1,14 @@
+-- DropForeignKey
+ALTER TABLE `users` DROP FOREIGN KEY `users_companyId_fkey`;
+
+-- AlterTable
+ALTER TABLE `companies` ADD COLUMN `licenseExpiresAt` DATETIME(3) NULL,
+    ADD COLUMN `plan` ENUM('FREE', 'BASIC', 'PRO', 'ENTERPRISE') NOT NULL DEFAULT 'FREE',
+    ADD COLUMN `status` ENUM('TRIAL', 'ACTIVE', 'BLOCKED', 'EXPIRED') NOT NULL DEFAULT 'TRIAL';
+
+-- AlterTable
+ALTER TABLE `users` MODIFY `role` ENUM('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'EMPLOYEE') NOT NULL DEFAULT 'EMPLOYEE',
+    MODIFY `companyId` VARCHAR(191) NULL;
+
+-- AddForeignKey
+ALTER TABLE `users` ADD CONSTRAINT `users_companyId_fkey` FOREIGN KEY (`companyId`) REFERENCES `companies`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;

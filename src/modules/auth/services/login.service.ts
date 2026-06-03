@@ -38,7 +38,7 @@ export async function loginService(app: FastifyInstance, data: LoginInput) {
       email: user.email,
       role: user.role,
       companyId: user.companyId,
-      companyName: user.company.name,
+      companyName: user.company?.name ?? null,
     },
   }
 }
