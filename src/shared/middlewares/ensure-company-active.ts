@@ -7,11 +7,38 @@ export async function ensureCompanyActive(
   reply: FastifyReply,
 ) {
   const userPayload = request.user as {
+    companyId?: string
+    impersonating?: boolean
     sub: string
     role: string
   }
 
   if (userPayload.role === 'SUPER_ADMIN') {
+    return
+  }
+
+  if (userPayload.role === 'SUPPORT' && userPayload.impersonating) {
+    if (!userPayload.companyId) {
+      return reply.status(403).send({
+        message: 'Empresa nao encontrada para o modo suporte',
+      })
+    }
+
+    const company = await prisma.company.findUnique({
+      where: {
+        id: userPayload.companyId,
+      },
+      select: {
+        id: true,
+      },
+    })
+
+    if (!company) {
+      return reply.status(403).send({
+        message: 'Empresa nao encontrada para o modo suporte',
+      })
+    }
+
     return
   }
 
