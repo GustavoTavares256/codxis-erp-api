@@ -1,14 +1,15 @@
-import { prisma } from '../../../shared/database/prisma'
 import {
   AuditLogAction,
-  CompanyStatus,
+  CompanyPlan,
 } from '@prisma/client'
+
+import { prisma } from '../../../shared/database/prisma'
 
 import { createAuditLogService } from './create-audit-log.service'
 
-export async function updateCompanyStatusService(
+export async function updateCompanyPlanService(
   companyId: string,
-  status: CompanyStatus,
+  plan: CompanyPlan,
   userId: string,
 ) {
   return prisma.$transaction(async (transaction) => {
@@ -23,22 +24,22 @@ export async function updateCompanyStatusService(
         id: companyId,
       },
       data: {
-        status,
+        plan,
       },
     })
 
     await createAuditLogService(
       {
-        action: AuditLogAction.COMPANY_STATUS_UPDATED,
+        action: AuditLogAction.COMPANY_PLAN_UPDATED,
         entity: 'Company',
         entityId: companyId,
         companyId,
         userId,
         oldValue: {
-          status: company.status,
+          plan: company.plan,
         },
         newValue: {
-          status: updatedCompany.status,
+          plan: updatedCompany.plan,
         },
       },
       transaction,

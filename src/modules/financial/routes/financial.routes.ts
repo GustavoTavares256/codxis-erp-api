@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify'
 
 import { ensureAuthenticated } from '../../../shared/middlewares/ensure-authenticated'
+import { ensureCompanyActive } from '../../../shared/middlewares/ensure-company-active'
 
 import { listFinancialController } from '../controllers/list-financial.controller'
 
@@ -14,7 +15,10 @@ export async function financialRoutes(
   app.get(
     '/',
     {
-      preHandler: ensureAuthenticated,
+      preHandler: [
+        ensureAuthenticated,
+        ensureCompanyActive,
+      ],
     },
     listFinancialController,
   )
@@ -22,7 +26,10 @@ export async function financialRoutes(
   app.post(
   '/expense',
   {
-    preHandler: ensureAuthenticated,
+    preHandler: [
+      ensureAuthenticated,
+      ensureCompanyActive,
+    ],
   },
   createExpenseController,
 )
@@ -30,7 +37,10 @@ export async function financialRoutes(
 app.get(
   '/summary',
   {
-    preHandler: ensureAuthenticated,
+    preHandler: [
+      ensureAuthenticated,
+      ensureCompanyActive,
+    ],
   },
   financialSummaryController,
 )

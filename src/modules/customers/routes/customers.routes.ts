@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify'
 
 import { ensureAuthenticated } from '../../../shared/middlewares/ensure-authenticated'
+import { ensureCompanyActive } from '../../../shared/middlewares/ensure-company-active'
 
 import { createCustomerController } from '../controllers/create-customer.controller'
 import { deleteCustomerController } from '../controllers/delete-customer.controller'
@@ -12,7 +13,10 @@ export async function customersRoutes(app: FastifyInstance) {
   app.post(
     '/',
     {
-      preHandler: ensureAuthenticated,
+      preHandler: [
+        ensureAuthenticated,
+        ensureCompanyActive,
+      ],
     },
     createCustomerController,
   )
@@ -20,7 +24,10 @@ export async function customersRoutes(app: FastifyInstance) {
   app.get(
     '/',
     {
-      preHandler: ensureAuthenticated,
+      preHandler: [
+        ensureAuthenticated,
+        ensureCompanyActive,
+      ],
     },
     listCustomersController,
   )
@@ -28,7 +35,10 @@ export async function customersRoutes(app: FastifyInstance) {
   app.get(
     '/:id',
     {
-      preHandler: ensureAuthenticated,
+      preHandler: [
+        ensureAuthenticated,
+        ensureCompanyActive,
+      ],
     },
     getCustomerByIdController,
   )
@@ -36,7 +46,10 @@ export async function customersRoutes(app: FastifyInstance) {
   app.put(
     '/:id',
     {
-      preHandler: ensureAuthenticated,
+      preHandler: [
+        ensureAuthenticated,
+        ensureCompanyActive,
+      ],
     },
     updateCustomerController,
   )
@@ -44,7 +57,10 @@ export async function customersRoutes(app: FastifyInstance) {
   app.delete(
     '/:id',
     {
-      preHandler: ensureAuthenticated,
+      preHandler: [
+        ensureAuthenticated,
+        ensureCompanyActive,
+      ],
     },
     deleteCustomerController,
   )

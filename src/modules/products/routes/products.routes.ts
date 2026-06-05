@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify'
 
 import { ensureAuthenticated } from '../../../shared/middlewares/ensure-authenticated'
+import { ensureCompanyActive } from '../../../shared/middlewares/ensure-company-active'
 
 import { createProductController } from '../controllers/create-product.controller'
 import { listProductsController } from '../controllers/list-products.controller'
@@ -12,7 +13,10 @@ export async function productsRoutes(app: FastifyInstance) {
   app.post(
     '/',
     {
-      preHandler: ensureAuthenticated,
+      preHandler: [
+        ensureAuthenticated,
+        ensureCompanyActive,
+      ],
     },
     createProductController,
   )
@@ -20,7 +24,10 @@ export async function productsRoutes(app: FastifyInstance) {
   app.get(
     '/',
     {
-      preHandler: ensureAuthenticated,
+      preHandler: [
+        ensureAuthenticated,
+        ensureCompanyActive,
+      ],
     },
     listProductsController,
   )
@@ -28,7 +35,10 @@ export async function productsRoutes(app: FastifyInstance) {
   app.get(
     '/:id',
     {
-      preHandler: ensureAuthenticated,
+      preHandler: [
+        ensureAuthenticated,
+        ensureCompanyActive,
+      ],
     },
     getProductByIdController,
   )
@@ -36,7 +46,10 @@ export async function productsRoutes(app: FastifyInstance) {
   app.put(
     '/:id',
     {
-      preHandler: ensureAuthenticated,
+      preHandler: [
+        ensureAuthenticated,
+        ensureCompanyActive,
+      ],
     },
     updateProductController,
   )
@@ -44,7 +57,10 @@ export async function productsRoutes(app: FastifyInstance) {
   app.delete(
     '/:id',
     {
-      preHandler: ensureAuthenticated,
+      preHandler: [
+        ensureAuthenticated,
+        ensureCompanyActive,
+      ],
     },
     deleteProductController,
   )

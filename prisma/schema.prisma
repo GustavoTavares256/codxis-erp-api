@@ -28,6 +28,7 @@ model Company {
   stockMovements        StockMovement[]
   suppliers             Supplier[]
   users                 User[]
+  auditLogs             AuditLog[]
 
   @@map("companies")
 }
@@ -44,6 +45,7 @@ model User {
 
   sales     Sale[]
   company   Company? @relation(fields: [companyId], references: [id])
+  auditLogs AuditLog[]
 
   @@index([companyId], map: "users_companyId_fkey")
   @@map("users")
@@ -195,6 +197,25 @@ model FinancialTransaction {
   @@map("financial_transactions")
 }
 
+model AuditLog {
+  id        String         @id @default(uuid())
+  action    AuditLogAction
+  entity    String
+  entityId  String
+  oldValue  Json?
+  newValue  Json?
+  companyId String?
+  userId    String?
+  createdAt DateTime       @default(now())
+
+  company   Company?       @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  user      User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([companyId], map: "audit_logs_companyId_fkey")
+  @@index([userId], map: "audit_logs_userId_fkey")
+  @@map("audit_logs")
+}
+
 enum Role {
   SUPER_ADMIN
   ADMIN
@@ -243,4 +264,10 @@ enum CompanyPlan {
   BASIC
   PRO
   ENTERPRISE
+}
+
+enum AuditLogAction {
+  COMPANY_STATUS_UPDATED
+  COMPANY_LICENSE_UPDATED
+  COMPANY_PLAN_UPDATED
 }

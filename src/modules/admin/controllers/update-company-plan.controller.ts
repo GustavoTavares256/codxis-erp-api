@@ -1,37 +1,37 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
 
-import { updateCompanyStatusService } from '../services/update-company-status.service'
+import { updateCompanyPlanService } from '../services/update-company-plan.service'
 
 const paramsSchema = z.object({
   id: z.string().uuid(),
 })
 
 const bodySchema = z.object({
-  status: z.enum([
-    'ACTIVE',
-    'BLOCKED',
-    'TRIAL',
-    'EXPIRED',
+  plan: z.enum([
+    'FREE',
+    'BASIC',
+    'PRO',
+    'ENTERPRISE',
   ]),
 })
 
-export async function updateCompanyStatusController(
+export async function updateCompanyPlanController(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {
   const { id } = paramsSchema.parse(request.params)
 
-  const { status } = bodySchema.parse(request.body)
+  const { plan } = bodySchema.parse(request.body)
 
   const user = request.user as {
     sub: string
   }
 
   const company =
-    await updateCompanyStatusService(
+    await updateCompanyPlanService(
       id,
-      status,
+      plan,
       user.sub,
     )
 

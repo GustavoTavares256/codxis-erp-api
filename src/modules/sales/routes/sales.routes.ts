@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify'
 
 import { ensureAuthenticated } from '../../../shared/middlewares/ensure-authenticated'
+import { ensureCompanyActive } from '../../../shared/middlewares/ensure-company-active'
 
 import { createSaleController } from '../controllers/create-sale.controller'
 import { listSalesController } from '../controllers/list-sales.controller'
@@ -11,7 +12,10 @@ export async function salesRoutes(app: FastifyInstance) {
   app.post(
     '/',
     {
-      preHandler: ensureAuthenticated,
+      preHandler: [
+        ensureAuthenticated,
+        ensureCompanyActive,
+      ],
     },
     createSaleController,
   )
@@ -19,7 +23,10 @@ export async function salesRoutes(app: FastifyInstance) {
   app.get(
     '/',
     {
-      preHandler: ensureAuthenticated,
+      preHandler: [
+        ensureAuthenticated,
+        ensureCompanyActive,
+      ],
     },
     listSalesController,
   )
@@ -27,14 +34,20 @@ export async function salesRoutes(app: FastifyInstance) {
   app.get(
     '/:id',
     {
-      preHandler: ensureAuthenticated,
+      preHandler: [
+        ensureAuthenticated,
+        ensureCompanyActive,
+      ],
     },
     getSaleByIdController,
   )
   app.patch(
   '/:id/cancel',
   {
-    preHandler: ensureAuthenticated,
+    preHandler: [
+      ensureAuthenticated,
+      ensureCompanyActive,
+    ],
   },
   cancelSaleController,
 )

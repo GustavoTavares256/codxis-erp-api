@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify'
 
 import { ensureAuthenticated } from '../../../shared/middlewares/ensure-authenticated'
+import { ensureCompanyActive } from '../../../shared/middlewares/ensure-company-active'
 
 import { stockInController } from '../controllers/stock-in.controller'
 import { stockOutController } from '../controllers/stock-out.controller'
@@ -11,7 +12,10 @@ export async function stockRoutes(app: FastifyInstance) {
   app.post(
     '/in',
     {
-      preHandler: ensureAuthenticated,
+      preHandler: [
+        ensureAuthenticated,
+        ensureCompanyActive,
+      ],
     },
     stockInController,
   )
@@ -19,7 +23,10 @@ export async function stockRoutes(app: FastifyInstance) {
   app.post(
     '/out',
     {
-      preHandler: ensureAuthenticated,
+      preHandler: [
+        ensureAuthenticated,
+        ensureCompanyActive,
+      ],
     },
     stockOutController,
   )
@@ -27,7 +34,10 @@ export async function stockRoutes(app: FastifyInstance) {
   app.get(
     '/movements',
     {
-      preHandler: ensureAuthenticated,
+      preHandler: [
+        ensureAuthenticated,
+        ensureCompanyActive,
+      ],
     },
     listStockMovementsController,
   )
@@ -35,7 +45,10 @@ export async function stockRoutes(app: FastifyInstance) {
   app.get(
   '/low-stock',
   {
-    preHandler: ensureAuthenticated,
+    preHandler: [
+      ensureAuthenticated,
+      ensureCompanyActive,
+    ],
   },
   listLowStockController,
 )
