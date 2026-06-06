@@ -7,6 +7,7 @@ const adapter = new PrismaMariaDb({
   user: 'codxis_user',
   password: 'codxis123',
   database: 'codxis_erp',
+  allowPublicKeyRetrieval: true,
 })
 
 export const prisma = new PrismaClient({

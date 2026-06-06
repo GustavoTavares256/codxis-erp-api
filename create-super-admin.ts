@@ -6,16 +6,17 @@ async function main() {
 
   const user = await prisma.user.upsert({
     where: {
-      email: 'suporte.codxis@gmail.com',
+      email: 'admin.codxis@gmail.com',
     },
     update: {
+      name: 'CodXis Super Admin',
       role: 'SUPER_ADMIN',
       companyId: null,
       password,
     },
     create: {
-      name: 'Gustavo Super Admin',
-      email: 'suporte.codxis@gmail.com',
+      name: 'CodXis Super Admin',
+      email: 'admin.codxis@gmail.com',
       password,
       role: 'SUPER_ADMIN',
       companyId: null,
@@ -26,3 +27,10 @@ async function main() {
 }
 
 main()
+  .catch((error) => {
+    console.error(error)
+    process.exit(1)
+  })
+  .finally(async () => {
+    await prisma.$disconnect()
+  })

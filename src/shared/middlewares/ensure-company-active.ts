@@ -2,12 +2,47 @@ import type { FastifyReply, FastifyRequest } from 'fastify'
 
 import { prisma } from '../database/prisma'
 
+const COMPANY_ROLES = ['ADMIN', 'MANAGER', 'EMPLOYEE']
+
+async function validateCompanyAccess(companyId: string, reply: FastifyReply) {
+  const company = await prisma.company.findUnique({
+    where: {
+      id: companyId,
+    },
+    select: {
+      id: true,
+      status: true,
+      licenseExpiresAt: true,
+    },
+  })
+
+  if (!company) {
+    return reply.status(403).send({
+      message: 'Empresa nao encontrada para este usuario',
+    })
+  }
+
+  if (company.status === 'BLOCKED' || company.status === 'EXPIRED') {
+    return reply.status(403).send({
+      message: 'Licenca expirada ou bloqueada. Entre em contato com a CodXis.',
+    })
+  }
+
+  if (company.licenseExpiresAt && company.licenseExpiresAt < new Date()) {
+    return reply.status(403).send({
+      message: 'Licenca expirada. Entre em contato com a CodXis.',
+    })
+  }
+
+  return undefined
+}
+
 export async function ensureCompanyActive(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {
   const userPayload = request.user as {
-    companyId?: string
+    companyId?: string | null
     impersonating?: boolean
     sub: string
     role: string
@@ -24,22 +59,13 @@ export async function ensureCompanyActive(
       })
     }
 
-    const company = await prisma.company.findUnique({
-      where: {
-        id: userPayload.companyId,
-      },
-      select: {
-        id: true,
-      },
+    return validateCompanyAccess(userPayload.companyId, reply)
+  }
+
+  if (COMPANY_ROLES.includes(userPayload.role) && !userPayload.companyId) {
+    return reply.status(403).send({
+      message: 'Usuario de empresa sem empresa vinculada',
     })
-
-    if (!company) {
-      return reply.status(403).send({
-        message: 'Empresa nao encontrada para o modo suporte',
-      })
-    }
-
-    return
   }
 
   const user = await prisma.user.findUnique({
@@ -51,27 +77,11 @@ export async function ensureCompanyActive(
     },
   })
 
-  if (!user || !user.company) {
+  if (!user || !user.companyId || !user.company) {
     return reply.status(403).send({
-      message: 'Empresa não encontrada para este usuário',
+      message: 'Empresa nao encontrada para este usuario',
     })
   }
 
-  if (
-    user.company.status === 'BLOCKED' ||
-    user.company.status === 'EXPIRED'
-  ) {
-    return reply.status(403).send({
-      message: 'Licença expirada ou bloqueada. Entre em contato com a CodXis.',
-    })
-  }
-
-  if (
-    user.company.licenseExpiresAt &&
-    user.company.licenseExpiresAt < new Date()
-  ) {
-    return reply.status(403).send({
-      message: 'Licença expirada. Entre em contato com a CodXis.',
-    })
-  }
+  return validateCompanyAccess(user.companyId, reply)
 }
