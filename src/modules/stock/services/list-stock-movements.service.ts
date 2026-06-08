@@ -10,6 +10,7 @@ export async function listStockMovementsService(companyId: string) {
         select: {
           id: true,
           name: true,
+          unit: true,
         },
       },
     },

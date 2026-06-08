@@ -8,6 +8,8 @@ import { listProductsController } from '../controllers/list-products.controller'
 import { getProductByIdController } from '../controllers/get-product-by-id.controller'
 import { updateProductController } from '../controllers/update-product.controller'
 import { deleteProductController } from '../controllers/delete-product.controller'
+import { exportProductsController } from '../controllers/export-products.controller'
+import { importProductsController } from '../controllers/import-products.controller'
 
 export async function productsRoutes(app: FastifyInstance) {
   app.post(
@@ -30,6 +32,28 @@ export async function productsRoutes(app: FastifyInstance) {
       ],
     },
     listProductsController,
+  )
+
+  app.get(
+    '/export',
+    {
+      preHandler: [
+        ensureAuthenticated,
+        ensureCompanyActive,
+      ],
+    },
+    exportProductsController,
+  )
+
+  app.post(
+    '/import',
+    {
+      preHandler: [
+        ensureAuthenticated,
+        ensureCompanyActive,
+      ],
+    },
+    importProductsController,
   )
 
   app.get(

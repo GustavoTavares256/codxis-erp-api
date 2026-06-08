@@ -1,3 +1,9 @@
 import type { FastifyInstance } from 'fastify'
 
-export function registerCompaniesModule(_app: FastifyInstance) {}
+import { companyRoutes } from './company.routes'
+
+export function registerCompaniesModule(app: FastifyInstance) {
+  app.register(companyRoutes, {
+    prefix: '/company',
+  })
+}

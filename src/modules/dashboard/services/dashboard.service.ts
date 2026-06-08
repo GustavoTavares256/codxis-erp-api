@@ -41,9 +41,10 @@ export async function dashboardService(companyId: string) {
     }),
   ])
 
-  const lowStockCount = lowStockProducts.filter(
+  const lowStockItems = lowStockProducts.filter(
     (product) => product.quantity <= product.minimumStock,
-  ).length
+  )
+  const lowStockCount = lowStockItems.length
 
   const revenue = financialTransactions
     .filter((transaction) => transaction.type === 'INCOME')
@@ -61,5 +62,12 @@ export async function dashboardService(companyId: string) {
     expenses,
     profit: revenue - expenses,
     lowStock: lowStockCount,
+    lowStockProducts: lowStockItems.slice(0, 5).map((product) => ({
+      id: product.id,
+      name: product.name,
+      quantity: product.quantity,
+      minimumStock: product.minimumStock,
+      unit: product.unit || 'UN',
+    })),
   }
 }

@@ -1,5 +1,6 @@
 import cors from "@fastify/cors";
 import jwt from "@fastify/jwt";
+import multipart from "@fastify/multipart";
 import Fastify from "fastify";
 
 import { env } from "./config/env";
@@ -22,6 +23,13 @@ export function buildApp() {
 
   app.register(jwt, {
     secret: env.JWT_SECRET,
+  });
+
+  app.register(multipart, {
+    limits: {
+      fileSize: 10 * 1024 * 1024,
+      files: 1,
+    },
   });
 
   app.setErrorHandler(errorHandler);

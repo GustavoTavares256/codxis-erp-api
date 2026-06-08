@@ -19,6 +19,7 @@ export async function listSalesService(companyId: string) {
             select: {
               id: true,
               name: true,
+              unit: true,
             },
           },
         },

@@ -3,6 +3,8 @@ import type { FastifyReply, FastifyRequest } from 'fastify'
 import { prisma } from '../database/prisma'
 
 const COMPANY_ROLES = ['ADMIN', 'MANAGER', 'EMPLOYEE']
+const LICENSE_BLOCKED_MESSAGE =
+  'Sua licença está bloqueada ou expirada. Entre em contato com a CodXis.'
 
 async function validateCompanyAccess(companyId: string, reply: FastifyReply) {
   const company = await prisma.company.findUnique({
@@ -24,13 +26,13 @@ async function validateCompanyAccess(companyId: string, reply: FastifyReply) {
 
   if (company.status === 'BLOCKED' || company.status === 'EXPIRED') {
     return reply.status(403).send({
-      message: 'Licenca expirada ou bloqueada. Entre em contato com a CodXis.',
+      message: LICENSE_BLOCKED_MESSAGE,
     })
   }
 
   if (company.licenseExpiresAt && company.licenseExpiresAt < new Date()) {
     return reply.status(403).send({
-      message: 'Licenca expirada. Entre em contato com a CodXis.',
+      message: LICENSE_BLOCKED_MESSAGE,
     })
   }
 

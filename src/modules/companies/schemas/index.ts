@@ -1,1 +1,1 @@
-export {}
+export * from './company-profile.schema'

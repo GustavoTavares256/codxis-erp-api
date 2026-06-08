@@ -9,9 +9,13 @@ datasource db {
 model Company {
   id                    String                 @id @default(uuid())
   name                  String
+  fantasyName           String?
   document              String?                @unique
   email                 String?
   phone                 String?
+  website               String?
+  address               String?                @db.Text
+  logoUrl               String?                @db.LongText
 
   plan                  CompanyPlan            @default(FREE)
   status                CompanyStatus          @default(TRIAL)
@@ -46,9 +50,24 @@ model User {
   sales     Sale[]
   company   Company? @relation(fields: [companyId], references: [id])
   auditLogs AuditLog[]
+  passwordResetTokens PasswordResetToken[]
 
   @@index([companyId], map: "users_companyId_fkey")
   @@map("users")
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  tokenHash String    @unique
+  userId    String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "password_reset_tokens_userId_fkey")
+  @@map("password_reset_tokens")
 }
 
 model Category {
@@ -90,6 +109,7 @@ model Product {
   salePrice      Decimal         @db.Decimal(10, 2)
   quantity       Int             @default(0)
   minimumStock   Int             @default(0)
+  unit           ProductUnit     @default(UN)
   isActive       Boolean         @default(true)
   companyId      String
   categoryId     String?
@@ -264,6 +284,23 @@ enum CompanyPlan {
   BASIC
   PRO
   ENTERPRISE
+}
+
+enum ProductUnit {
+  UN
+  CX
+  PC
+  KG
+  G
+  TON
+  L
+  ML
+  M
+  CM
+  M2
+  M3
+  SC
+  FD
 }
 
 enum AuditLogAction {

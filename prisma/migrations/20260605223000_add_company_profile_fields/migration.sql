@@ -1,0 +1,5 @@
+ALTER TABLE `companies`
+  ADD COLUMN `fantasyName` VARCHAR(191) NULL,
+  ADD COLUMN `website` VARCHAR(191) NULL,
+  ADD COLUMN `address` TEXT NULL,
+  ADD COLUMN `logoUrl` TEXT NULL;
